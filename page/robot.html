@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./robot.css">
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="head">聊天机器人</div>
+        <div class="content" id="content">
+            <div id="text"></div>
+        </div>
+        <div class="bot">
+            <input type="text" class="inp" id="inp">
+            <button class="btn" id="btn">发送</button>
+        </div>
+    </div>
+    <script>
+        var conH = content.offsetHeight
+        var initH = text.offsetHeight
+        inp.onkeydown = function (e) {
+            var val = this.value
+            if (e instanceof KeyboardEvent && e.key !== 'Enter') {
+                return
+            }
+            if (val == null || val == '') {
+                return
+            }
+            fn(val)
+        }
+        btn.onclick = function () {
+            var val = inp.value
+            fn(val)
+        }
+
+        function fn(val) {
+            var me = document.createElement('p')
+            me.classList.add("me")
+            me.innerText = "我：" + val;
+            text.appendChild(me)
+            inp.value = ''
+            var ajax = new XMLHttpRequest();
+            ajax.open("get","http://127.0.0.1:12306/chat?value=" + val)
+            ajax.send()
+            ajax.onreadystatechange = function(){
+                if(ajax.readyState == 4 && ajax.status == 200){
+                    var data = JSON.parse(ajax.responseText)
+                    var robotSay = document.createElement('p')
+                    robotSay.classList.add("robot")
+                    robotSay.innerText = "机器人："+data.text
+                    text.appendChild(robotSay)
+                    var h = content.scrollTop
+                    var lastH = text.offsetHeight
+                    content.scrollTop = lastH - conH
+                    initH = lastH
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
